@@ -29,19 +29,26 @@
 									<span class="now">￥{{food.price}}</span>
 									<span v-show="food.oldPrice" class="old">￥{{food.oldPrice}}</span>
 								</div>
+								<!--组件外包裹容器用于定位-->
+								<div class="cartcontrol-w">
+									<!--将列表循环中的food数据传入子组件-->
+									<cartcontrol :food="food"></cartcontrol>
+								</div>
 							</div>
 						</li>
 					</ul>
 				</li>
 			</ul>
 		</div>
-		<shopcart :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>	
+		<!--关键点：将selectFoods作为计算属性传入子组件,实现父子组件间的联动-->
+		<shopcart ref="shopcart" :select-foods="selectFoods" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>	
 	</div>	
 </template>
 
 <script>
 	import BScroll from 'better-scroll'
 	import shopcart from 'components/shopcart/shopcart'
+	import cartcontrol from 'components/cartcontrol/cartcontrol'
 
 	const ERR_OK = 0
 
@@ -70,6 +77,20 @@
 	  			}
 	  		}
 	  		return 0
+	  	},
+	  	//选中的商品，父子组件通信精髓？响应式数据
+	  	selectFoods(){
+	  		let foods = []
+	  		this.goods.forEach((good)=>{
+	  			good.foods.forEach((food)=>{
+	  				//判断count属性是否存在，若存在说明在cartcontrol组件中添加按钮已被点击，创建了count属性
+	  				if(food.count){
+	  					//将选中的商品放入数组
+	  					foods.push(food)
+	  				}
+	  			})
+	  		})
+	  		return foods
 	  	}
 	  },
 	  created(){
@@ -123,10 +144,24 @@
 	  		let el = foodList[index]
 	  		//调用better-scroll实例化后的接口，实现点击后的滚动动画
 	  		this.foodsScroll.scrollToElement(el,300)
+	  	},
+	  	_drop(target){
+	  		//调用nextTick接口触发方法，优化动画效果提高性能
+	  		this.$nextTick(()=>{
+	  			this.$refs.shopcart.drop(target)
+	  		})	  		
 	  	}
 	  },
+	  
+	  events:{
+	  	'cart.add'(target){
+	  		this._drop(target)
+	  	}
+	  },
+	  
 	  components:{
-	  	shopcart
+	  	shopcart,
+	  	cartcontrol
 	  }
 	}
 </script>
@@ -257,6 +292,11 @@
 							font-size: 10px;
 							color:rgb(147,153,159);
 						}
+					}
+					.cartcontrol-w{
+						position: absolute;
+						right:0;
+						bottom:12px;
 					}
 				}
 			}
