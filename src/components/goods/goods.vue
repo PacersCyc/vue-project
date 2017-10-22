@@ -1,47 +1,50 @@
 <template>
-	<div class="goods">
-		<div class="menu-w" ref="menu">
-			<ul>
-				<li v-for="(item,index) in goods" class="menu-item" :class="{current:currentIndex===index}" @click="selectMenu(index)">
-					<span class="text border-1px">
-						<span v-show="item.type>0" class="icon" :class="classMap[item.type]"></span>{{item.name}}
-					</span>
-				</li>
-			</ul>
+	<div class="goods-w">
+		<div class="goods">
+			<div class="menu-w" ref="menu">
+				<ul>
+					<li v-for="(item,index) in goods" class="menu-item" :class="{current:currentIndex===index}" @click="selectMenu(index)">
+						<span class="text border-1px">
+							<span v-show="item.type>0" class="icon" :class="classMap[item.type]"></span>{{item.name}}
+						</span>
+					</li>
+				</ul>
+			</div>
+			<div class="foods-w" ref="foods">
+				<ul>
+					<li v-for="item in goods" class="food-list food-list-hook">
+						<h1 class="title">{{item.name}}</h1>
+						<ul>
+							<li v-for="food in item.foods" class="food-item border-1px" @click="selectFood(food)">
+								<div class="icon">
+									<img :src="food.icon" width="57" height="57">
+								</div>
+								<div class="content">
+									<h2 class="name">{{food.name}}</h2>
+									<p class="desc">{{food.description}}</p>
+									<div class="extra">
+										<span class="count">月售{{food.sellCount}}份</span>
+										<span>好评率{{food.rating}}%</span>
+									</div>
+									<div class="price">
+										<span class="now">￥{{food.price}}</span>
+										<span v-show="food.oldPrice" class="old">￥{{food.oldPrice}}</span>
+									</div>
+									<!--组件外包裹容器用于定位-->
+									<div class="cartcontrol-w">
+										<!--将列表循环中的food数据传入子组件-->
+										<cartcontrol :food="food"></cartcontrol>
+									</div>
+								</div>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+			<!--关键点：将selectFoods作为计算属性传入子组件,实现父子组件间的联动-->
+			<shopcart ref="shopcart" :select-foods="selectFoods" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>	
 		</div>
-		<div class="foods-w" ref="foods">
-			<ul>
-				<li v-for="item in goods" class="food-list food-list-hook">
-					<h1 class="title">{{item.name}}</h1>
-					<ul>
-						<li v-for="food in item.foods" class="food-item border-1px">
-							<div class="icon">
-								<img :src="food.icon" width="57" height="57">
-							</div>
-							<div class="content">
-								<h2 class="name">{{food.name}}</h2>
-								<p class="desc">{{food.description}}</p>
-								<div class="extra">
-									<span class="count">月售{{food.sellCount}}份</span>
-									<span>好评率{{food.rating}}%</span>
-								</div>
-								<div class="price">
-									<span class="now">￥{{food.price}}</span>
-									<span v-show="food.oldPrice" class="old">￥{{food.oldPrice}}</span>
-								</div>
-								<!--组件外包裹容器用于定位-->
-								<div class="cartcontrol-w">
-									<!--将列表循环中的food数据传入子组件-->
-									<cartcontrol :food="food"></cartcontrol>
-								</div>
-							</div>
-						</li>
-					</ul>
-				</li>
-			</ul>
-		</div>
-		<!--关键点：将selectFoods作为计算属性传入子组件,实现父子组件间的联动-->
-		<shopcart ref="shopcart" :select-foods="selectFoods" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>	
+		<food :food="selectedFood" ref="food"></food>
 	</div>	
 </template>
 
@@ -49,6 +52,7 @@
 	import BScroll from 'better-scroll'
 	import shopcart from 'components/shopcart/shopcart'
 	import cartcontrol from 'components/cartcontrol/cartcontrol'
+	import food from 'components/food/food'
 
 	const ERR_OK = 0
 
@@ -63,7 +67,8 @@
 	  		goods:[],
 	  		//用于存储每个区间的高度
 	  		listHeight:[],
-	  		scrollY:0
+	  		scrollY:0,
+	  		selectedFood:{}
 	  	}
 	  },
 	  computed:{
@@ -150,6 +155,10 @@
 	  		this.$nextTick(()=>{
 	  			this.$refs.shopcart.drop(target)
 	  		})	  		
+	  	},
+	  	selectFood(food){
+	  		this.selectedFood = food
+	  		this.$refs.food.show()
 	  	}
 	  },
 	  
@@ -161,7 +170,8 @@
 	  
 	  components:{
 	  	shopcart,
-	  	cartcontrol
+	  	cartcontrol,
+	  	food
 	  }
 	}
 </script>
