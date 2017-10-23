@@ -33,7 +33,7 @@
 									<!--组件外包裹容器用于定位-->
 									<div class="cartcontrol-w">
 										<!--将列表循环中的food数据传入子组件-->
-										<cartcontrol :food="food"></cartcontrol>
+										<cartcontrol @add="addFood" :food="food"></cartcontrol>
 									</div>
 								</div>
 							</li>
@@ -44,7 +44,7 @@
 			<!--关键点：将selectFoods作为计算属性传入子组件,实现父子组件间的联动-->
 			<shopcart ref="shopcart" :select-foods="selectFoods" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>	
 		</div>
-		<food :food="selectedFood" ref="food"></food>
+		<food @add="addFood" :food="selectedFood" ref="food"></food>
 	</div>	
 </template>
 
@@ -159,15 +159,18 @@
 	  	selectFood(food){
 	  		this.selectedFood = food
 	  		this.$refs.food.show()
+	  	},
+	  	addFood(target){
+	  		this._drop(target)
 	  	}
 	  },
-	  
+	  /*
 	  events:{
 	  	'cart.add'(target){
 	  		this._drop(target)
 	  	}
 	  },
-	  
+	  */
 	  components:{
 	  	shopcart,
 	  	cartcontrol,

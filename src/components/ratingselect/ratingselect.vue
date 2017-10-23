@@ -47,6 +47,11 @@
 				}
 			}
 		},
+		data(){
+			return {
+
+			}
+		},
 		computed:{
 			//计算属性设置好评数
 			positives(){
@@ -64,13 +69,13 @@
 		methods:{
 			//点击按钮切换评价类型
 			select(type){
-				this.selectType = type
-				this.$dispatch('ratingtype.select',type)
+				//this.selectType = type
+				this.$emit('select',type)
 			},
 			//切换评价内容显示
 			toggleContent(){
-				this.onlyContent = !this.onlyContent
-				this.$dispatch('content.toggle',this.onlyContent)
+				//this.onlyContent = !this.onlyContent
+				this.$emit('toggle')
 			}
 		}
 	}

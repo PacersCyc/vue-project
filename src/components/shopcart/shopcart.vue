@@ -22,11 +22,20 @@
 				</div>
 			</div>
 			<div class="ball-container">
+				<div v-for="(ball,index) in balls"  :key="index">						
+					<transition name="drop" v-on:before-enter="beforeEnter" v-on:enter="enter" v-on:after-enter="afterEnter">
+						<div class="ball" v-show="ball.show">
+							<div class="inner inner-hook"></div>
+						</div>
+					</transition>	
+				</div>
+				<!--	
 				<transition-group name="drop" v-on:before-enter="beforeEnter" v-on:enter="enter" v-on:after-enter="afterEnter">
 					<div v-for="(ball,index) in balls" v-show="ball.show" class="ball" key="index">
 						<div class="inner inner-hook"></div>
 					</div>
-				</transition-group>			
+				</transition-group>	
+				-->		
 			</div>
 
 			<transition name="fold">
@@ -190,7 +199,7 @@
 					if(!ball.show){
 						ball.show = true
 						ball.el = el
-						this.dropBall.push(ball)
+						this.dropBalls.push(ball)
 						return
 					}
 				}
@@ -201,7 +210,7 @@
 					let ball = this.balls[count]
 					if(ball.show){
 						let rect = ball.el.getBoundingClientRect()
-						let x = recct.left - 32
+						let x = rect.left - 32
 						let y = -(window.innerHeight - rect.top -22)
 						el.style.display = ''
 						el.style.webkitTransform = `translate3d(0,${y}px,0)`
@@ -212,7 +221,7 @@
 					}
 				}
 			},
-			enter(el){
+			enter(el,done){
 				//触发重绘，更新视图
 				let rf = el.offsetHeight
 				this.$nextTick(()=>{
@@ -221,6 +230,7 @@
 					let inner = el.getElementsByClassName('inner-hook')[0]
 					inner.style.webkitTransform = 'translate3d(0,0,0)'
 					inner.style.transform = 'translate3d(0,0,0)'
+					el.addEventListener('transitionend',done)
 				})
 			},
 			afterEnter(el){

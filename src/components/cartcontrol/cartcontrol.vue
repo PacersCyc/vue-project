@@ -31,7 +31,7 @@
 				}else{
 					this.food.count++
 				}
-				//this.$dispatch('cart.add',event.target)
+				this.$emit('add',event.target)
 			},
 			decreaseCart(){
 				if(this.food.count){

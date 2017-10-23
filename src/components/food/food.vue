@@ -19,7 +19,7 @@
 						<span class="old" v-show="food.oldPrice">￥{{food.oldPrice}}</span>
 					</div>
 					<div class="cartcontrol-w">
-						<cartcontrol :food="food"></cartcontrol>
+						<cartcontrol @add="addBall" :food="food"></cartcontrol>
 					</div>
 					<transition name="fade">
 						<div class="buy" v-show="!food.count || food.count===0" @click.stop.prevent="addFirst">加入购物车</div>
@@ -34,7 +34,7 @@
 				<split></split>
 				<div class="rating">
 					<h1 class="title">商品评价</h1>
-					<ratingselect :select-type="selectType" :only-content="onlyContent" :desc="desc" :ratings="food.ratings"></ratingselect>
+					<ratingselect @select="selectRating" @toggle="toggleContent" :select-type="selectType" :only-content="onlyContent" :desc="desc" :ratings="food.ratings"></ratingselect>
 					<div class="rating-w">
 						<ul v-show="food.ratings && food.ratings.length">
 							<!--v-show可以绑定函数返回值-->
@@ -107,9 +107,15 @@
 				this.showFlag = false
 			},
 			addFirst(){
-				//this.$dispatch('cart.add',event.target)
+				this.$emit('add',event.target)
 				Vue.set(this.food,'count',1)
 			},
+			
+			addBall(){
+				this.$emit('add',event.target)
+				//this.food.count++
+			},
+			
 			needShow(type,text){
 				if(this.onlyContent && !text){
 					return false
@@ -119,8 +125,21 @@
 				}else{
 					return type === this.selectType
 				}
+			},
+			selectRating(type){
+				this.selectType = type
+				this.$nextTick(()=>{
+					this.scroll.refresh()
+				})
+			},
+			toggleContent(){
+				this.onlyContent = !this.onlyContent
+				this.$nextTick(()=>{
+					this.scroll.refresh()
+				})
 			}
 		},
+		/*
 		events:{
 			'ratingtype.select'(type){
 				this.selectType = type
@@ -136,6 +155,7 @@
 				
 			}
 		},
+		*/
 		filters:{
 			formatDate(time){
 				let date = new Date(time)

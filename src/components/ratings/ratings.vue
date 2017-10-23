@@ -25,7 +25,7 @@
 				</div>
 			</div>
 			<split></split>
-			<ratingselect :select-type="selectType" :only-content="onlyContent" :ratings="ratings"></ratingselect>
+			<ratingselect @select="selectRating" @toggle="toggleContent" :select-type="selectType" :only-content="onlyContent" :ratings="ratings"></ratingselect>
 			<div class="rating-w">
 				<ul>
 					<li class="rating-item border-1px" v-for="rating in ratings" v-show="needShow(rating.rateType,rating.text)">
@@ -99,8 +99,21 @@
 			}else{
 				return type === this.selectType
 			}
+		},
+		selectRating(type){
+			this.selectType = type
+			this.$nextTick(()=>{
+				this.scroll.refresh()
+			})
+		},
+		toggleContent(){
+			this.onlyContent = !this.onlyContent
+			this.$nextTick(()=>{
+				this.scroll.refresh()
+			})
 		}
 	  },
+	  /*
 	  events:{
 		'ratingtype.select'(type){
 			this.selectType = type
@@ -116,6 +129,7 @@
 				
 		}
 	  },
+	  */
 	  filters:{
 		formatDate(time){
 			let date = new Date(time)
