@@ -6,12 +6,15 @@
       <router-link to="/ratings" class="tab-item">评价</router-link>
       <router-link to="/seller" class="tab-item">商家</router-link> 
     </div>
-    <router-view :seller="seller"></router-view>
+    <keep-alive>
+      <router-view :seller="seller"></router-view>
+    </keep-alive>      
   </div>
 </template>
 
 <script>
   import header from 'components/header/header'
+  import {urlParse} from 'common/js/util.js'
 
   //采用常量定义状态码
   const ERR_OK = 0
@@ -19,14 +22,22 @@
   export default {
     data(){
       return {
-        seller:{}
+        seller:{
+          id:(()=>{
+            let queryParam = urlParse()
+            console.log(queryParam) 
+            return queryParam.id
+          })()
+        }
       }
     },
     created(){
-      this.$http.get('/api/seller').then((response)=>{
+      this.$http.get('/api/seller?id='+this.seller.id).then((response)=>{
         response = response.body
         if(response.errno === ERR_OK){
-          this.seller = response.data
+          //为了保留id参数，不能够直接赋值，应采用对象扩展方法
+          //this.seller = response.data
+          this.seller = Object.assign({},this.seller,response.data)
         }
       })
     },
